@@ -1,0 +1,57 @@
+--- dwm.c
++++ dwm.c
+@@ -473,7 +506,7 @@ buttonpress(XEvent *e)
+ 			arg.ui = 1 << i;
+ 		} else if (ev->x < x + TEXTW(selmon->ltsymbol))
+ 			click = ClkLtSymbol;
+-		else if (ev->x > selmon->ww - (int)TEXTW(stext) + lrpad - 2)
++		else if (ev->x > selmon->ww - (int)TEXTW(stext) + lrpad - 2 - getsystraywidth())
+ 			click = ClkStatusText;
+ 		else
+ 			click = ClkWinTitle;
+@@ -968,16 +1069,33 @@ getatomprop(Client *c, Atom prop)
+ 	unsigned long nitems, dl;
+ 	unsigned char *p = NULL;
+ 	Atom da, atom = None;
++	Atom req = XA_ATOM;
++	if (prop == xatom[XembedInfo])
++		req = xatom[XembedInfo];
+ 
+-	if (XGetWindowProperty(dpy, c->win, prop, 0L, sizeof atom, False, XA_ATOM,
+-		&da, &format, &nitems, &dl, &p) == Success && p) {
+-		if (nitems > 0 && format == 32)
++	if (XGetWindowProperty(dpy, c->win, prop, 0L, sizeof atom, False, req,
++ 		&da, &format, &nitems, &dl, &p) == Success && p) {
++		if (nitems > 0 && format == 32) {
+ 			atom = *(long *)p;
++			if (da == xatom[XembedInfo] && nitems == 2) {
++				atom = ((long *)p)[1];
++			}
++		}
+ 		XFree(p);
+ 	}
+ 	return atom;
+ }
+ 
++unsigned int
++getsystraywidth()
++{
++	unsigned int w = 0;
++	Client *i;
++	if(showsystray)
++		for(i = systray->icons; i; w += i->w + systrayspacing, i = i->next) ;
++	return w ? w + systrayspacing : 1;
++}
++
+ int
+ getrootptr(int *x, int *y)
+ {
+@@ -1642,7 +1825,7 @@ setfocus(Client *c)
+ 		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
+ 	XChangeProperty(dpy, root, netatom[NetActiveWindow], XA_WINDOW, 32,
+ 		PropModeReplace, (unsigned char *)&c->win, 1);
+-	sendevent(c, wmatom[WMTakeFocus]);
++	sendevent(c->win, wmatom[WMTakeFocus], NoEventMask, wmatom[WMTakeFocus], CurrentTime, 0, 0, 0);
+ }
+ 
+ void
