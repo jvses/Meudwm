@@ -1,14 +1,12 @@
 --- dwm.c
 +++ dwm.c
-@@ -237,7 +239,11 @@ static int xerrorstart(Display *dpy, XErrorEvent *ee);
- static void zoom(const Arg *arg);
+@@ -723,6 +790,9 @@ destroynotify(XEvent *e)
  
- /* variables */
-+static const char autostartblocksh[] = "autostart_blocking.sh";
-+static const char autostartsh[] = "autostart.sh";
- static const char broken[] = "broken";
-+static const char dwmdir[] = "dwm";
-+static const char localshare[] = ".local/share";
- static char stext[256];
- static int screen;
- static int sw, sh;           /* X display screen geometry width, height */
+ 	if ((c = wintoclient(ev->window)))
+ 		unmanage(c, 1);
++
++	else if ((c = swallowingclient(ev->window)))
++		unmanage(c->swallowing, 1);
+ }
+ 
+ void
