@@ -4,6 +4,7 @@ static const Block blocks[] = {
 	{""		,"mram"			,1			,0},
 	{""		,"bateria"		,10			,0},
 	{" "		,"hora"			,1			,0},
+	{""		,"volume"		,0			,10},
 };
 
 //sets delimeter between status commands. NULL character ('\0') means no delimeter.

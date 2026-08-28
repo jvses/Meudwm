@@ -11,7 +11,7 @@ static const int systraypinningfailfirst = 1;   /* 1: if pinning fails, display 
 static const int showsystray        = 1;     /* 0 means no systray */
 static const int showbar            = 1;     /* 0 means no bar */
 static const int topbar             = 1;     /* 0 means bottom bar */
-static const char *fonts[]          = { "Hack Nerd Font:style=Regular:pixelsize=16:antialias=true:autohint=true"};
+static const char *fonts[]          = { "Hack Nerd Font:style=Regular:pixelsize=14:antialias=true:autohint=true"};
 static const char dmenufont[]       = "monospace:size=10";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
@@ -41,7 +41,9 @@ static const Rule rules[] = {
 	 */
    /* class     instance  title           tags mask  isfloating  isterminal  noswallow  monitor */
    { "Gimp",    NULL,     NULL,           0,         1,          0,           0,		  -1 },
-   { "Firefox", NULL,     NULL,           1 << 8,    0,          0,          -1,	  -1 },
+   { "Firefox", NULL,     NULL,           1 << 8,    0,          0,          -1,    	  -1 },
+   { "Blueman-manager", NULL,   NULL,     0,       1,          0,          -1, 	      -1 },
+   { "Pavucontrol", NULL,       NULL,     0,       1,          0,          -1, 	      -1 },
    { "st-256color",      NULL,     NULL,           0,         0,          1,           0,	  -1 },
    { NULL,      NULL,     "Event Tester", 0,         0,          0,           1,	  -1 }, /* xev */
 
@@ -77,6 +79,23 @@ static const Layout layouts[] = {
 //static const char *dmenucmd[] = { "dmenu_run", "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 static const char *dmenucmd[] = { "dmenu_run", "-fn", dmenufont, "-nb", norm_bg, "-nf", norm_fg, "-sb", sel_bg, "-sf", sel_fg, NULL };
 static const char *termcmd[]  = { "st", NULL };
+//static const char  "-q", "sset", "Master", "5%+", "&&", "pkill", "-RTMIN+10", "dwmblocks",
+
+#include <X11/XF86keysym.h>
+//funções de controle de volume
+/*
+static const char *upvol[]   = { "amixer", "-q", "sset", "Master", "5%+", "&&", "pkill", "-RTMIN+10", "dwmblocks", NULL };
+static const char *downvol[] = { "amixer", "-q", "sset", "Master", "5%-", "&&", "pkill", "-RTMIN+10", "dwmblocks", NULL };
+static const char *mutevol[] = { "amixer", "-q", "sset", "Master", "toggle", "&&", "pkill", "-RTMIN+10", "dwmblocks", NULL };*/
+
+/* botoes pra controle de volume
+static Key keys[] = {
+	{ MODKEY,                       XK_Up,    spawn,          {.v = upvol   } },
+	{ MODKEY,                       XK_Down,    spawn,          {.v = downvol } },
+	{ MODKEY,                       XK_m,     spawn,          {.v = mutevol } },
+};*/
+
+
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
@@ -104,7 +123,33 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
-	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
+	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 }
+	},
+
+
+	/****** Change the volume */
+//	{ MODKEY,                       XK_Up,    spawn,  SHCMD("amixer -q sset Master 5%+ && pkill -RTMIN+10 dwmblocks") },
+//	{ MODKEY,                       XK_Down,  spawn,  SHCMD("amixer -q sset Master 5%- && pkill -RTMIN+10 dwmblocks") },
+//       	{ MODKEY,                       XK_m,     spawn,  SHCMD("amixer -q sset Master toggle && pkill -RTMIN+10 dwmblocks")}, 
+//	{ 0,                       XF86XK_AudioLowerVolume, spawn,  SHCMD("amixer -q sset Master 5%- && pkill -RTMIN+10 dwmblocks")},
+//	{ 0,                       XF86XK_AudioMute,        spawn,  SHCMD("amixer -q sset Master toggle && pkill -RTMIN+10 dwmblocks")},
+//	{ 0,                       XF86XK_AudioRaiseVolume, spawn,  SHCMD("amixer -q sset Master 5%+ && pkill -RTMIN+10 dwmblocks")},
+
+	{ MODKEY,                       XK_Up,    spawn,  SHCMD("pamixer -i 5 && pkill -RTMIN+10 dwmblocks") },
+	{ MODKEY,                       XK_Down,  spawn,  SHCMD("pamixer -d 5 && pkill -RTMIN+10 dwmblocks") },
+       	{ MODKEY,                       XK_m,     spawn,  SHCMD("amixer -q sset Master toggle && pkill -RTMIN+10 dwmblocks")}, 
+	{ 0,                       XF86XK_AudioLowerVolume, spawn,  SHCMD("apamixer -d 5 && pkill -RTMIN+10 dwmblocks")},
+	{ 0,                       XF86XK_AudioMute,        spawn,  SHCMD("amixer -q sset Master toggle && pkill -RTMIN+10 dwmblocks")},
+	{ 0,                       XF86XK_AudioRaiseVolume, spawn,  SHCMD("pamixer -i 5 && pkill -RTMIN+10 dwmblocks")},
+
+
+	/* Change brightness */
+	{ MODKEY,	XK_KP_Right,	spawn,		SHCMD("xbacklight + 5 && pkill -RTMIN+9 dwmblocks") },
+	{ MODKEY, 	XK_KP_Left,	spawn,		SHCMD("xbacklight - 5 && pkill -RTMIN+9 dwmblocks") },
+	{ MODKEY,  	XK_KP_Multiply,	spawn,		SHCMD("xbacklight = 50 && pkill -RTMIN+9 dwmblocks") },
+		
+	
+	
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)

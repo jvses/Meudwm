@@ -1,12 +1,13 @@
 #define CMDLENGTH 30
-#define DELIMITER " "
+#define DELIMITER "|"
 #define CLICKABLE_BLOCKS
 
 const Block blocks[] = {
 	//BLOCK("sb-mail",    1800, 17),
 	BLOCK("mram",   1,    18),
 	BLOCK("bateria",    10, 19),
-	BLOCK("hora",  1,   20)
+	BLOCK("hora",  1,   20),
+	BLOCK("volume", 0,   10)
 	/*BLOCK("sb-loadavg", 5,    21),
 	BLOCK("sb-mic",     0,    26),
 	BLOCK("sb-record",  0,    27),
